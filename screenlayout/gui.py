@@ -1,16 +1,16 @@
 # ARandR -- Another XRandR GUI
 # Copyright (C) 2008 -- 2011 chrysn <chrysn@fsfe.org>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -103,6 +103,7 @@ class Application(object):
             <toolitem action="New" />
             <toolitem action="Open" />
             <toolitem action="SaveAs" />
+            <toolitem action="Refresh" />
         </toolbar>
     </ui>
     """
@@ -118,6 +119,7 @@ class Application(object):
             ("New", gtk.STOCK_NEW, None, None, None, self.do_new),
             ("Open", gtk.STOCK_OPEN, None, None, None, self.do_open),
             ("SaveAs", gtk.STOCK_SAVE_AS, None, None, None, self.do_save_as),
+            ("Refresh", gtk.STOCK_REFRESH, None, None, None, self.do_refresh),
 
             ("Apply", gtk.STOCK_APPLY, None, '<Control>Return', None, self.do_apply),
             ("LayoutSettings", gtk.STOCK_PROPERTIES, None, '<Alt>Return', None, self.do_open_properties),
@@ -178,6 +180,9 @@ class Application(object):
         self.gconf = None
 
     #################### actions ####################
+    @actioncallback
+    def do_refresh(self):
+        self.widget.load_from_x()
 
     @actioncallback
     def set_zoom(self, value): # don't use directly: state is not pushed back to action group.
