@@ -186,19 +186,20 @@ class Application(object):
 
     @actioncallback
     def do_open_properties(self):
-        d = gtk.Dialog(_("Script Properties"), None, gtk.DIALOG_MODAL, (gtk.STOCK_CLOSE, gtk.RESPONSE_ACCEPT))
-        d.set_default_size(300,400)
+        d = gtk.Dialog(_("Display properties"), None, gtk.DIALOG_MODAL, (gtk.STOCK_CLOSE, gtk.RESPONSE_ACCEPT))
+        d.set_default_size(600,400)
 
         script_editor = gtk.TextView()
+        script_editor.set_wrap_mode(gtk.WRAP_CHAR)
         script_buffer = script_editor.get_buffer()
-        script_buffer.set_text("\n".join(self.filetemplate))
+        script_buffer.set_text(self.widget._xrandr.configuration.to_json())
         script_editor.props.editable = False
 
         #wacom_options = gtk.Label("FIXME")
 
         nb = gtk.Notebook()
         #nb.append_page(wacom_options, gtk.Label(_("Wacom options")))
-        nb.append_page(script_editor, gtk.Label(_("Script")))
+        nb.append_page(script_editor, gtk.Label(_("Config")))
 
         d.vbox.pack_start(nb)
         d.show_all()
