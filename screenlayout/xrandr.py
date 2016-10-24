@@ -16,7 +16,9 @@
 
 """Wrapper around command line xrandr (mostly 1.2 per output features supported)"""
 
+import json
 import os
+import re
 import subprocess
 import warnings
 
@@ -26,6 +28,8 @@ import gettext
 gettext.install('arandr')
 
 SHELLSHEBANG='#!/bin/sh'
+
+EDID_PATTERN = re.compile(r'^\t\t[0-9a-f]{32}$')
 
 class Feature(object):
     PRIMARY = 1
@@ -137,7 +141,7 @@ class XRandR(object):
 
         self._load_parse_screenline(screenline)
 
-        for headline,details in items:
+        for headline,details,edid in items:
             if headline.startswith("  "): continue # a currently disconnected part of the screen i can't currently get any info out of
             if headline == "": continue # noise
 
@@ -197,7 +201,7 @@ class XRandR(object):
                     o.modes.append(NamedSize(r, name=n))
 
             self.state.outputs[o.name] = o
-            self.configuration.outputs[o.name] = self.configuration.OutputConfiguration(active, primary, geometry, rotation, currentname)
+            self.configuration.outputs[o.name] = self.configuration.OutputConfiguration(active, primary, geometry, rotation, currentname, edid)
 
     def _load_raw_lines(self):
         output = self._output("--verbose")
@@ -207,6 +211,9 @@ class XRandR(object):
             if l.startswith("Screen "):
                 assert screenline is None
                 screenline = l
+            elif EDID_PATTERN.match(l):
+                # Parse out EDID
+                items[-1][2] += l.strip()
             elif l.startswith('\t'):
                 continue
             elif l.startswith(2*' '): # [mode, width, height]
@@ -217,7 +224,8 @@ class XRandR(object):
                 else: # mode
                     items[-1][1].append([l.split()])
             else:
-                items.append([l, []])
+                items.append([l, [], ""])
+
         return screenline, items
 
     def _load_parse_screenline(self, screenline):
@@ -329,10 +337,27 @@ class XRandR(object):
                     args.append(o.rotation)
             return args
 
+        def to_json(self):
+            data = {"outputs": {}}
+
+            for on,o in self.outputs.items():
+                data["outputs"][on] = {"active": o.active}
+
+                # Properties only set if the monitor is active (connected)
+                if o.active:
+                    data["outputs"][on]["edid"] = o.edid
+                    data["outputs"][on]["primary"] = Feature.PRIMARY in self._xrandr.features and o.primary
+                    data["outputs"][on]["resolution"] = [o.mode.width, o.mode.height]
+                    data["outputs"][on]["position"] = [o.position.left, o.position.top]
+                    data["outputs"][on]["rotation"] = o.rotation
+
+            return json.dumps(data, sort_keys=True, indent=4)
+
         class OutputConfiguration(object):
-            def __init__(self, active, primary, geometry, rotation, modename):
+            def __init__(self, active, primary, geometry, rotation, modename, edid):
                 self.active = active
                 self.primary = primary
+                self.edid = edid
                 if active:
                     self.position = geometry.position
                     self.rotation = rotation

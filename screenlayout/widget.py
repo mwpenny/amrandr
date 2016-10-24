@@ -113,6 +113,10 @@ class ARandRWidget(gtk.DrawingArea):
         os.chmod(file, stat.S_IRWXU)
         self.load_from_file(file)
 
+    def save_to_json(self, file):
+        data = self._xrandr.configuration.to_json()
+        open(file, 'w').write(data)
+
     #################### doing changes ####################
 
     def _set_something(self, which, on, data):

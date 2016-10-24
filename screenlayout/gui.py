@@ -245,8 +245,10 @@ class Application(object):
         if result == gtk.RESPONSE_ACCEPT:
             assert len(filenames) == 1
             f = filenames[0]
-            if not f.endswith('.sh'): f = f + '.sh'
-            self.widget.save_to_file(f, self.filetemplate)
+            #if not f.endswith('.sh'): f = f + '.sh'
+            #self.widget.save_to_file(f, self.filetemplate)
+            if not f.endswith('.json'): f = f + '.json'
+            self.widget.save_to_json(f)
 
     def _new_file_dialog(self, title, type, buttontype):
         d = gtk.FileChooserDialog(title, None, type)
@@ -261,8 +263,10 @@ class Application(object):
         d.set_current_folder(layoutdir)
 
         f = gtk.FileFilter()
-        f.set_name('Shell script (Layout file)')
-        f.add_pattern('*.sh')
+        #f.set_name('Shell script (Layout file)')
+        #f.add_pattern('*.sh')
+        f.set_name('Screen layout profile (JSON)')
+        f.add_pattern('*.json')
         d.add_filter(f)
 
         return d
