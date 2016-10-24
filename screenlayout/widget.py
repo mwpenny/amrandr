@@ -1,16 +1,16 @@
 # ARandR -- Another XRandR GUI
 # Copyright (C) 2008 -- 2011 chrysn <chrysn@fsfe.org>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -209,6 +209,7 @@ class ARandRWidget(gtk.DrawingArea):
 
         for on in self.sequence:
             o = cfg.outputs[on]
+            if not self._xrandr.state.outputs[on].connected: continue
             if not o.active: continue
 
             rect = (o.tentative_position if hasattr(o, 'tentative_position') else o.position) + tuple(o.size)
@@ -292,6 +293,7 @@ class ARandRWidget(gtk.DrawingArea):
         outputs = set()
         for on,o in self._xrandr.configuration.outputs.items():
             if not o.active: continue
+            if not self._xrandr.state.outputs[on].connected: continue
             if o.position[0]-self.factor <= x <= o.position[0]+o.size[0]+self.factor and o.position[1]-self.factor <= y <= o.position[1]+o.size[1]+self.factor:
                 outputs.add(on)
         return outputs
@@ -314,7 +316,7 @@ class ARandRWidget(gtk.DrawingArea):
             i.props.submenu = self._contextmenu(on)
             m.add(i)
 
-            if not oc.active and not os.connected:
+            if not oc.active or not os.connected:
                 i.props.sensitive = False
         m.show_all()
         return m
@@ -330,7 +332,7 @@ class ARandRWidget(gtk.DrawingArea):
 
         m.add(enabled)
 
-        if oc.active:
+        if oc.active and os.connected:
             if Feature.PRIMARY in self._xrandr.features:
                 primary = gtk.CheckMenuItem(_("Primary"))
                 primary.props.active = oc.primary
