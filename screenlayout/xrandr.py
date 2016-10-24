@@ -93,6 +93,25 @@ class XRandR(object):
 
         return lines
 
+    def load_from_json(self, js):
+        for on,conf in json.loads(js)["outputs"].items():
+            o = self.configuration.outputs[on]
+            os = self.state.outputs[on]
+
+            o.active = conf["active"]
+
+            if o.active:
+                o.primary = Feature.PRIMARY in self.features and conf["primary"]
+                o.position = Position(conf["position"])
+                o.rotation = Rotation(conf["rotation"])
+
+                for namedmode in os.modes:
+                    if namedmode.name == conf["resolution"]:
+                        o.mode = namedmode
+                        break
+                else:
+                    raise FileLoadError("Unsupported resolution: %s"%conf["resolution"])
+
     def _load_from_commandlineargs(self, commandline):
         self.load_from_x()
 
@@ -347,8 +366,8 @@ class XRandR(object):
                 if o.active:
                     data["outputs"][on]["edid"] = o.edid
                     data["outputs"][on]["primary"] = Feature.PRIMARY in self._xrandr.features and o.primary
-                    data["outputs"][on]["resolution"] = [o.mode.width, o.mode.height]
-                    data["outputs"][on]["position"] = [o.position.left, o.position.top]
+                    data["outputs"][on]["resolution"] = str(o.mode.name)
+                    data["outputs"][on]["position"] = (o.position.left, o.position.top)
                     data["outputs"][on]["rotation"] = o.rotation
 
             return json.dumps(data, sort_keys=True, indent=4)

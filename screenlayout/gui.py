@@ -224,7 +224,7 @@ class Application(object):
 
     @actioncallback
     def do_open(self):
-        d = self._new_file_dialog(_("Open Layout"), gtk.FILE_CHOOSER_ACTION_OPEN, gtk.STOCK_OPEN)
+        d = self._new_file_dialog(_("Load profile"), gtk.FILE_CHOOSER_ACTION_OPEN, gtk.STOCK_OPEN)
 
         result = d.run()
         filenames = d.get_filenames()
@@ -232,11 +232,12 @@ class Application(object):
         if result == gtk.RESPONSE_ACCEPT:
             assert len(filenames) == 1
             f = filenames[0]
-            self.filetemplate = self.widget.load_from_file(f)
+            #self.filetemplate = self.widget.load_from_file(f)
+            self.filetemplate = self.widget.load_from_json(f)
 
     @actioncallback
     def do_save_as(self):
-        d = self._new_file_dialog(_("Save Layout"), gtk.FILE_CHOOSER_ACTION_SAVE, gtk.STOCK_SAVE)
+        d = self._new_file_dialog(_("Save Profile"), gtk.FILE_CHOOSER_ACTION_SAVE, gtk.STOCK_SAVE)
         d.props.do_overwrite_confirmation = True
 
         result = d.run()

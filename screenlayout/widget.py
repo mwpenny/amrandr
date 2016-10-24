@@ -89,6 +89,11 @@ class ARandRWidget(gtk.DrawingArea):
         self._xrandr_was_reloaded()
         return template
 
+    def load_from_json(self, file):
+        data = open(file).read()
+        self._xrandr.load_from_json(data)
+        self._xrandr_was_reloaded()
+
     def load_from_x(self):
         self._xrandr.load_from_x()
         self._xrandr_was_reloaded()
