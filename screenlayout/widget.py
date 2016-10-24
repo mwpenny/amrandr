@@ -120,7 +120,7 @@ class ARandRWidget(gtk.DrawingArea):
 
     def save_to_json(self, file):
         data = self._xrandr.configuration.to_json()
-        open(file, 'w').write(data)
+        open(file, 'w').write(data + "\n")
 
     #################### doing changes ####################
 
