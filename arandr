@@ -19,6 +19,9 @@
 """Run ARandR GUI"""
 
 import sys
+import os
+import signal
+import atexit
 import gettext
 
 # monkey patch gettext for local execution
@@ -37,6 +40,39 @@ if sys.argv[0].startswith('./'):
     gettext.find = find_wrapper
 
 from profiling import monitor_info
+
+
+
+PID_FILE_PATH = '/tmp/amrandr.pid'
+def remove_pid_file():
+    try:
+        os.remove(PID_FILE_PATH)
+    except OSError:
+        pass
+
+pid_file = None
+try:
+    # using os.open to get access to atomic file creation
+    pid_file = os.open(PID_FILE_PATH, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    pid = str(os.getpid())
+    bytes_written = os.write(pid_file, pid)
+    if bytes_written != len(pid):
+        sys.stderr.writeline("Warning: could not write to pid file")
+except OSError:
+    # Failed to create the file. Might be that it already exists
+    try:
+        running_amrandr_pid = open(PID_FILE_PATH, 'r').read()
+        running_amrandr_pid = int(running_amrandr_pid)
+        os.kill(running_amrandr_pid, signal.SIGUSR1)
+        sys.exit(0)
+    except (IOError, OSError, ValueError):
+        # pid file doesn't exist / can't read from the file / pid is stale
+        remove_pid_file() # clean out the bad pid file
+
+if pid_file is not None:
+    os.close(pid_file)
+
+atexit.register(remove_pid_file)
 
 # defer importing and thus loading locales until monkey patching is done
 

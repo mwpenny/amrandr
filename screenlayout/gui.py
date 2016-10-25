@@ -17,6 +17,7 @@
 """Main GUI for ARandR"""
 
 import os
+import signal
 import optparse
 import inspect
 
@@ -329,4 +330,9 @@ def main():
             randr_display=options.randr_display,
             force_version=options.force_version
             )
+
+    def handler(signum, frame):
+        a.do_refresh()
+    signal.signal(signal.SIGUSR1, handler)
+
     a.run()
