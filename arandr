@@ -57,7 +57,7 @@ try:
     pid = str(os.getpid())
     bytes_written = os.write(pid_file, pid)
     if bytes_written != len(pid):
-        sys.stderr.writeline("Warning: could not write to pid file")
+        sys.stderr.write("Warning: could not write to pid file\n")
 except OSError:
     # Failed to create the file. Might be that it already exists
     try:

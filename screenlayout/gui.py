@@ -332,7 +332,7 @@ def main():
             )
 
     def handler(signum, frame):
-        a.do_refresh()
+        a.widget.autoload()
     signal.signal(signal.SIGUSR1, handler)
 
     a.run()

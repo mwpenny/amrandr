@@ -16,7 +16,6 @@
 
 """Wrapper around command line xrandr (mostly 1.2 per output features supported)"""
 
-import json
 import os
 import re
 import subprocess
@@ -93,8 +92,8 @@ class XRandR(object):
 
         return lines
 
-    def load_from_json(self, js):
-        for on,conf in json.loads(js)["outputs"].items():
+    def load_from_dict(self, d):
+        for on,conf in d["outputs"].items():
             o = self.configuration.outputs[on]
             os = self.state.outputs[on]
 
@@ -356,7 +355,7 @@ class XRandR(object):
                     args.append(o.rotation)
             return args
 
-        def to_json(self):
+        def to_dict(self):
             data = {"outputs": {}}
 
             for on,o in self.outputs.items():
@@ -370,7 +369,7 @@ class XRandR(object):
                     data["outputs"][on]["position"] = (o.position.left, o.position.top)
                     data["outputs"][on]["rotation"] = o.rotation
 
-            return json.dumps(data, sort_keys=True, indent=4)
+            return data
 
         class OutputConfiguration(object):
             def __init__(self, active, primary, geometry, rotation, modename, edid):

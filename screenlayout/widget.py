@@ -15,8 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
+import json
 import os
 import stat
+import sys
 import pango
 import pangocairo
 import gobject, gtk
@@ -89,10 +91,42 @@ class ARandRWidget(gtk.DrawingArea):
         self._xrandr_was_reloaded()
         return template
 
+    def autoload(self):
+        self.load_from_x()
+        current_edids = {props["edid"]
+                         for (_, props)
+                         in self._xrandr.configuration.to_dict()["outputs"].iteritems()
+                         if "edid" in props}
+        layoutdir = os.path.expanduser('~/.screenlayout/')
+        files = [os.path.join(layoutdir, f)
+                 for f in os.listdir(layoutdir)
+                 if os.path.isfile(os.path.join(layoutdir, f)) and f.endswith(".json")]
+        for f in files:
+            try:
+                data = json.loads(open(f).read())
+                profile_edids = {props["edid"]
+                                 for (_, props)
+                                 in data["outputs"].iteritems()
+                                 if "edid" in props}
+                if current_edids == profile_edids:
+                    # Monitor combination matches, apply profile
+                    print "Autoload '%s'" % f
+                    self._xrandr.load_from_dict(data)
+                    self._xrandr_was_reloaded()
+                    self.save_to_x()
+                    return
+
+            except ValueError:
+                sys.stderr.write("Warning: invalid JSON in '%s'\n" % f)
+
+
     def load_from_json(self, file):
-        data = open(file).read()
-        self._xrandr.load_from_json(data)
-        self._xrandr_was_reloaded()
+        try:
+            data = json.loads(open(file).read())
+            self._xrandr.load_from_dict(data)
+            self._xrandr_was_reloaded()
+        except ValueError:
+            self.error_message(_("Invalid JSON"))
 
     def load_from_x(self):
         self._xrandr.load_from_x()
@@ -119,8 +153,8 @@ class ARandRWidget(gtk.DrawingArea):
         self.load_from_file(file)
 
     def save_to_json(self, file):
-        data = self._xrandr.configuration.to_json()
-        open(file, 'w').write(data + "\n")
+        data = self._xrandr.configuration.to_dict()
+        open(file, 'w').write(json.dumps(data, sort_keys=True, indent=4) + "\n")
 
     #################### doing changes ####################
 
