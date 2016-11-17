@@ -332,7 +332,9 @@ def main():
             )
 
     def handler(signum, frame):
+        # Automatically load and apply the configuration for the current setup
         a.widget.autoload()
     signal.signal(signal.SIGUSR1, handler)
 
+    handler(None, None)
     a.run()
