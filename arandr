@@ -39,10 +39,6 @@ if sys.argv[0].startswith('./'):
 
     gettext.find = find_wrapper
 
-from profiling import monitor_info
-
-
-
 PID_FILE_PATH = '/tmp/amrandr.pid'
 def remove_pid_file():
     try:
