@@ -120,6 +120,9 @@ class ARandRWidget(gtk.DrawingArea):
             self._xrandr_was_reloaded()
             self.save_to_x()
 
+    def autosave(self):
+        path = os.path.expanduser("~/.screenlayout/" + self._xrandr.configuration.get_id() + ".json")
+        self.save_to_json(path)
 
     def load_from_json(self, file):
         try:
@@ -149,13 +152,17 @@ class ARandRWidget(gtk.DrawingArea):
 
     def save_to_file(self, file, template=None, additional=None):
         data = self._xrandr.save_to_shellscript_string(template, additional)
-        open(file, 'w').write(data)
+        f = open(file, 'w')
+        f.write(data)
         os.chmod(file, stat.S_IRWXU)
         self.load_from_file(file)
+        f.close()
 
     def save_to_json(self, file):
         data = self._xrandr.configuration.to_dict()
-        open(file, 'w').write(json.dumps(data, sort_keys=True, indent=4) + "\n")
+        f = open(file, 'w')
+        f.write(json.dumps(data, sort_keys=True, indent=4) + "\n")
+        f.close()
 
     #################### doing changes ####################
 

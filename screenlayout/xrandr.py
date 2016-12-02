@@ -16,6 +16,7 @@
 
 """Wrapper around command line xrandr (mostly 1.2 per output features supported)"""
 
+import md5
 import os
 import re
 import subprocess
@@ -385,6 +386,14 @@ class XRandR(object):
                     data["outputs"][on]["rotation"] = o.rotation
 
             return data
+
+        def get_id(self):
+            m = md5.new()
+            for k,v in self.to_dict()["outputs"].items():
+                if v["active"]:
+                    m.update(v["edid"])
+            return m.hexdigest()
+
 
         class OutputConfiguration(object):
             def __init__(self, active, primary, geometry, rotation, modename, edid):

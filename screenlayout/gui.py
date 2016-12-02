@@ -220,6 +220,7 @@ class Application(object):
 
         try:
             self.widget.save_to_x()
+            self.widget.autosave()
         except Exception, e:
             d = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, _("XRandR failed:\n%s")%e)
             d.run()
