@@ -231,6 +231,7 @@ class ARandRWidget(gtk.DrawingArea):
     #################### painting ####################
 
     def do_expose_event(self, event):
+        self.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.FLEUR))
         cr = pangocairo.CairoContext(self.window.cairo_create())
         cr.rectangle(event.area.x, event.area.y, event.area.width, event.area.height)
         cr.clip()
@@ -254,7 +255,7 @@ class ARandRWidget(gtk.DrawingArea):
         cr.rectangle(0,0,*state.virtual.max)
         cr.fill()
 
-        cr.set_source_rgb(0.5,0.5,0.5)
+        cr.set_source_rgb(0.25,0.25,0.25)
         cr.rectangle(0,0,*cfg.virtual)
         cr.fill()
 

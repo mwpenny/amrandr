@@ -83,16 +83,8 @@ class Application(object):
                 <separator />
                 <menuitem action="Quit" />
             </menu>
-            <menu action="View">
-                <menuitem action="Zoom4" />
-                <menuitem action="Zoom8" />
-                <menuitem action="Zoom16" />
-            </menu>
             <menu action="Outputs" name="Outputs">
                 <menuitem action="OutputsDummy" />
-            </menu>
-            <menu action="System">
-                <menuitem action="Metacity" />
             </menu>
             <menu action="Help">
                 <menuitem action="About" />
@@ -122,29 +114,14 @@ class Application(object):
             ("Open", gtk.STOCK_OPEN, None, None, None, self.do_open),
             ("SaveAs", gtk.STOCK_SAVE_AS, None, None, None, self.do_save_as),
             ("Refresh", gtk.STOCK_REFRESH, None, None, None, self.do_refresh),
-
             ("Apply", gtk.STOCK_APPLY, None, '<Control>Return', None, self.do_apply),
             ("LayoutSettings", gtk.STOCK_PROPERTIES, None, '<Alt>Return', None, self.do_open_properties),
-
             ("Quit", gtk.STOCK_QUIT, None, None, None, gtk.main_quit),
-
-
-            ("View", None, _("_View")),
-
             ("Outputs", None, _("_Outputs")),
             ("OutputsDummy", None, _("Dummy")),
-
-            ("System", None, _("_System")),
-            ("Metacity", None, _("_Keybindings (Metacity)"), None, None, self.do_open_metacity),
-
             ("Help", None, _("_Help")),
             ("About", gtk.STOCK_ABOUT, None, None, None, self.about),
             ])
-        actiongroup.add_radio_actions([
-            ("Zoom4", None, _("1:4"), None, None, 4),
-            ("Zoom8", None, _("1:8"), None, None, 8),
-            ("Zoom16", None, _("1:16"), None, None, 16),
-            ], 8, self.set_zoom)
 
         window.connect('destroy', gtk.main_quit)
 
