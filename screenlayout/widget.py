@@ -91,12 +91,10 @@ class ARandRWidget(gtk.DrawingArea):
         self._xrandr_was_reloaded()
         return template
 
-    def autoload(self):
+    # return the json dict of the first matching profile
+    def search_matching_profile(self):
         self.load_from_x()
-        current_edids = {props["edid"]
-                         for (_, props)
-                         in self._xrandr.configuration.to_dict()["outputs"].iteritems()
-                         if "edid" in props}
+        current_edids = self._xrandr.grab_all_edid()
         layoutdir = os.path.expanduser('~/.screenlayout/')
         files = [os.path.join(layoutdir, f)
                  for f in os.listdir(layoutdir)
@@ -109,15 +107,18 @@ class ARandRWidget(gtk.DrawingArea):
                                  in data["outputs"].iteritems()
                                  if "edid" in props}
                 if current_edids == profile_edids:
-                    # Monitor combination matches, apply profile
-                    print "Autoload '%s'" % f
-                    self._xrandr.load_from_dict(data)
-                    self._xrandr_was_reloaded()
-                    self.save_to_x()
-                    return
-
+                    print "matching '%s'" % f
+                    return data
             except ValueError:
                 sys.stderr.write("Warning: invalid JSON in '%s'\n" % f)
+
+    def autoload(self):
+        data = self.search_matching_profile()
+        if data:
+            # Monitor combination matches, apply profile
+            self._xrandr.load_from_dict(data)
+            self._xrandr_was_reloaded()
+            self.save_to_x()
 
 
     def load_from_json(self, file):

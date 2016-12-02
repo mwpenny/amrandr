@@ -333,7 +333,9 @@ def main():
 
     def handler(signum, frame):
         # Automatically load and apply the configuration for the current setup
+        print "got sinal"
         a.widget.autoload()
+        print a.widget._xrandr.grab_all_edid()
     signal.signal(signal.SIGUSR1, handler)
 
     handler(None, None)

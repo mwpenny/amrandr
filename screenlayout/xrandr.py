@@ -1,16 +1,16 @@
 # ARandR -- Another XRandR GUI
 # Copyright (C) 2008 -- 2011 chrysn <chrysn@fsfe.org>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -20,6 +20,8 @@ import os
 import re
 import subprocess
 import warnings
+from Xlib import display
+from Xlib import X
 
 from .auxiliary import BetterList, Size, Position, Geometry, FileLoadError, FileSyntaxError, InadequateConfiguration, Rotation, ROTATIONS, NORMAL, NamedSize
 
@@ -278,6 +280,19 @@ class XRandR(object):
     def save_to_x(self):
         self.check_configuration()
         self._run(*self.configuration.commandlineargs())
+
+    def grab_all_edid(self):
+        d = display.Display()
+        s = d.screen()
+        res = s.root.xrandr_get_screen_resources()
+        edid = d.intern_atom("EDID")
+        connected_edids = []
+        for o in res.outputs:
+            prop = d.xrandr_get_output_property(o, edid, X.AnyPropertyType, 0, 100)
+            if len(prop.value) > 0:
+                edid_str_buf = ["{:02x}".format(e) for e in prop.value]
+                connected_edids.append("".join(edid_str_buf))
+        return set(connected_edids)
 
     def check_configuration(self):
         vmax = self.state.virtual.max
