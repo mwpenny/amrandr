@@ -360,7 +360,7 @@ class ARandRWidget(gtk.DrawingArea):
             i.props.submenu = self._contextmenu(on)
             m.add(i)
 
-            if not oc.active or not os.connected:
+            if not os.connected:
                 i.props.sensitive = False
         m.show_all()
         return m
