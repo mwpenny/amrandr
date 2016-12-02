@@ -112,6 +112,7 @@ class Application(object):
     def __init__(self, file=None, randr_display=None, force_version=False):
         self.window = window = gtk.Window()
         window.props.title = "Screen Layout Editor"
+        window.maximize()
 
         # actions
         actiongroup = gtk.ActionGroup('default')
