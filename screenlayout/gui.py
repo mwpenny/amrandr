@@ -92,10 +92,6 @@ class Application(object):
         </menubar>
         <toolbar name="ToolBar">
             <toolitem action="Apply" />
-            <separator />
-            <toolitem action="New" />
-            <toolitem action="Open" />
-            <toolitem action="SaveAs" />
             <toolitem action="Refresh" />
         </toolbar>
     </ui>
